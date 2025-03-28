@@ -8,11 +8,51 @@ use App\Models\Student;
 class StudentController extends Controller
 {
     // Display a list of students
-    public function index()
-    {
-        $students = Student::all(); // Later: add filtering logic
-        return view('index', compact('students'));
+    public function index(Request $request)
+{
+    $query = Student::query();
+    if ($request->ajax()) {
+        if ($request->has('search') && !empty($request->search)) {
+            $search = trim($request->input('search'));
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+        if ($request->has('min_age') && $request->has('max_age')) {
+            $min_age = $request->input('min_age');
+            $max_age = $request->input('max_age');
+            $query->whereBetween('age', [$min_age, $max_age]);
+        } elseif ($request->has('min_age')) {
+            $min_age = $request->input('min_age');
+            $query->where('age', '>=', $min_age);
+        } elseif ($request->has('max_age')) {
+            $max_age = $request->input('max_age');
+            $query->where('age', '<=', $max_age);
+        }
+        $students = $query->get();
+        return response()->json($students, 200);
     }
+    if ($request->has('search') || $request->has('min_age') || $request->has('max_age')) {
+
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+
+        if ($request->has('min_age') && $request->has('max_age')) {
+            $min_age = $request->min_age;
+            $max_age = $request->max_age;
+            $query->whereBetween('age', [$min_age, $max_age]);
+        } elseif ($request->has('min_age')) {
+            $min_age = $request->min_age;
+            $query->where('age', '>=', $min_age);
+        } elseif ($request->has('max_age')) {
+            $max_age = $request->max_age;
+            $query->where('age', '<=', $max_age);
+        }
+    }
+    $students = $query->get();
+    return view('index', compact('students'));
+}
+
 
     // Show the form to create a new student
     public function create()

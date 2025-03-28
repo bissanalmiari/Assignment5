@@ -3,7 +3,10 @@
 @section('title', 'Students')
 @section('content')
 <h2>Students</h2>
-<!-- TODO: Add search bar here -->
+<input type="text" name="name" id="search" placeholder="search by name" class="m-2" autocomplete="off">
+<input type="number" id="min_age" placeholder="min age" class="m-2">
+<input type="number" id="max_age" placeholder="max age" class="m-2">
+
 <table class="table mt-3">
     <thead>
         <tr>
@@ -13,8 +16,8 @@
         </tr>
     </thead>
     <tbody id="student-table">
-        <!-- TODO: Display student list here -->
+        @include('student_rows', ['students' => $students])
     </tbody>
 </table>
-<!-- TODO: Add jQuery AJAX logic -->
+
 @endsection
